@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+pywinctl
+google-generativeai
+python-multipart
+pynput
+mss
+Pillow
+pandas
+openpyxl
+python-docx
+PyPDF2
+aiofiles

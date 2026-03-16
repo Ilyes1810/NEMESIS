@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEMESIS - Command Center</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f3ff;
+            --secondary: #ff0055;
+            --bg-dark: #0a0a0c;
+            --panel-bg: rgba(20, 20, 25, 0.85);
+            --text-main: #e0e0e0;
+            --border-glow: rgba(0, 243, 255, 0.3);
+            --active: #2ecc71;
+            --inactive: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* --- AMBIANCE --- */
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 99;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 243, 255, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: fixed;
+            bottom: 100%;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 20%, var(--bg-dark) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- HEADER --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            position: relative;
+            z-index: 20;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nemesis-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        h1 span {
+            color: var(--primary);
+            display: block;
+            font-size: 0.8rem;
+            margin-top: -5px;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .status-item .label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .status-item .value {
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .value.online {
+            color: var(--active);
+            animation: flicker 2s infinite;
+        }
+
+        .value.offline {
+            color: var(--inactive);
+        }
+
+        @keyframes flicker {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-protocol {
+            padding: 8px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+        }
+
+        .btn-start {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .btn-stop {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .btn-start:hover {
+            background: #2ecc71;
+            color: #000;
+            box-shadow: 0 0 15px #2ecc71;
+        }
+
+        .btn-stop:hover {
+            background: #e74c3c;
+            color: #000;
+            box-shadow: 0 0 15px #e74c3c;
+        }
+
+        /* --- MAIN CONTENT --- */
+        main {
+            padding: 30px 40px;
+            position: relative;
+            z-index: 20;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 30px;
+            height: calc(100vh - 100px);
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--panel-bg);
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-card h3 {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--text-main);
+        }
+
+        .stat-value.warning {
+            color: var(--secondary);
+            text-shadow: 0 0 10px var(--secondary);
+        }
+
+        /* --- TABLE --- */
+        .log-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-header h2 {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--primary);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.95rem;
+        }
+
+        tr:hover {
+            background: rgba(0, 243, 255, 0.03);
+        }
+
+        .severity-pill {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .sev-1 {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .sev-2 {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
+        .sev-3 {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
+        }
+
+        /* --- TOOLS --- */
+        .cyber-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 15px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cyber-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        footer {
+            padding: 10px 40px;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #555;
+            position: relative;
+            z-index: 20;
+        }
+
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scanline"></div>
+    <div class="overlay"></div>
+
+    <header>
+        <div class="logo-container">
+            <div class="nemesis-logo"></div>
+            <h1>NEMESIS <span>COMMAND CENTER</span></h1>
+        </div>
+
+        <div class="controls">
+            <button id="btn-start" class="btn-protocol btn-start">START PROTOCOL</button>
+            <button id="btn-stop" class="btn-protocol btn-stop">STOP PROTOCOL</button>
+        </div>
+
+        <div class="system-status">
+            <div class="status-item">
+                <span class="label">PROTOCOL:</span>
+                <span id="protocol-status" class="value online">ACTIVE</span>
+            </div>
+            <div class="status-item">
+                <span class="label">UPTIME:</span>
+                <span id="uptime" class="value">00:00:00</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="stats-panel">
+            <div class="stat-card">
+                <h3>TOTAL VIOLATIONS</h3>
+                <div id="total-violations" class="stat-value">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>CRITICAL ALERTS</h3>
+                <div id="critical-alerts" class="stat-value warning">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>ACTIVE MONITORING</h3>
+                <div class="stat-value">EYES ON</div>
+            </div>
+        </section>
+
+        <section class="log-panel">
+            <div class="panel-header">
+                <h2>VIOLATION FEED</h2>
+                <button id="refresh-btn" class="cyber-btn">REFRESH SYSTEM</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>SOURCE</th>
+                            <th>WINDOW / APP</th>
+                            <th>RULE / VIOLATION</th>
+                            <th>SEVERITY</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-body">
+                        <!-- Logs dynamically injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 NEMESIS PROTOCOL - ABSOLUTE COMPLIANCE</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logBody = document.getElementById('log-body');
+            const totalViolationsElem = document.getElementById('total-violations');
+            const criticalAlertsElem = document.getElementById('critical-alerts');
+            const refreshBtn = document.getElementById('refresh-btn');
+            const uptimeElem = document.getElementById('uptime');
+
+            const btnStart = document.getElementById('btn-start');
+            const btnStop = document.getElementById('btn-stop');
+            const protocolStatus = document.getElementById('protocol-status');
+
+            let startTime = Date.now();
+            let isSystemActive = true;
+
+            // --- UPTIME ENGINE ---
+            function updateUptime() {
+                if (!isSystemActive) return;
+                const diff = Date.now() - startTime;
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                uptimeElem.innerText = `${h}:${m}:${s}`;
+            }
+            setInterval(updateUptime, 1000);
+
+            // --- STATUS POLLER ---
+            async function checkStatus() {
+                try {
+                    const response = await fetch('/status');
+                    const data = await response.json();
+                    updateStatusUI(data.active);
+                } catch (e) {
+                    console.error("Status check failed");
+                }
+            }
+
+            function updateStatusUI(active) {
+                isSystemActive = active;
+                if (active) {
+                    protocolStatus.innerText = "ACTIVE";
+                    protocolStatus.className = "value online";
+                    btnStart.style.opacity = "0.5";
+                    btnStart.style.pointerEvents = "none";
+                    btnStop.style.opacity = "1";
+                    btnStop.style.pointerEvents = "auto";
+                } else {
+                    protocolStatus.innerText = "STANDBY";
+                    protocolStatus.className = "value offline";
+                    btnStart.style.opacity = "1";
+                    btnStart.style.pointerEvents = "auto";
+                    btnStop.style.opacity = "0.5";
+                    btnStop.style.pointerEvents = "none";
+                }
+            }
+
+            // --- PROTOCOL CONTROLS ---
+            btnStart.addEventListener('click', async () => {
+                await fetch('/start', { method: 'POST' });
+                checkStatus();
+            });
+
+            btnStop.addEventListener('click', async () => {
+                await fetch('/stop', { method: 'POST' });
+                checkStatus();
+            });
+
+            // --- DATA FETCHER ---
+            async function fetchHistory() {
+                if (!isSystemActive) return;
+                try {
+                    const response = await fetch('/history');
+                    const data = await response.json();
+                    renderLogs(data);
+                } catch (error) {
+                    console.error("❌ FAILED TO FETCH NEMESIS DATA:", error);
+                }
+            }
+
+            function renderLogs(logs) {
+                logBody.innerHTML = '';
+                const reversedLogs = [...logs].reverse();
+                let criticalCount = 0;
+
+                reversedLogs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    const severity = log.severite || (log.rule === 'LOGIQUE' || log.rule === 'FAIT' ? 3 : 2);
+                    if (severity === 3) criticalCount++;
+
+                    tr.innerHTML = `
+                        <td><span style="color: #888">[</span>${log.timestamp}<span style="color: #888">]</span></td>
+                        <td><span style="color: var(--primary)">${log.source}</span></td>
+                        <td>${log.window}</td>
+                        <td>
+                            <div style="font-weight: bold">${log.error}</div>
+                            <div style="font-size: 0.75rem; color: #777">REQ: ${log.rule}</div>
+                        </td>
+                        <td><span class="severity-pill sev-${severity}">LVL ${severity}</span></td>
+                    `;
+                    logBody.appendChild(tr);
+                });
+
+                totalViolationsElem.innerText = logs.length;
+                criticalAlertsElem.innerText = criticalCount;
+            }
+
+            // --- INITIALIZATION ---
+            checkStatus();
+            fetchHistory();
+
+            setInterval(checkStatus, 2000);
+            setInterval(fetchHistory, 5000);
+
+            refreshBtn.addEventListener('click', () => {
+                refreshBtn.innerText = "SYNCHING...";
+                fetchHistory().then(() => {
+                    setTimeout(() => {
+                        refreshBtn.innerText = "REFRESH SYSTEM";
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{
+    "blacklist": [
+        "banque",
+        "messenger",
+        "photos",
+        "password",
+        "whatsapp",
+        "gestionnaire",
+        "paypal",
+        "stripe"
+    ]
+}
