@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "NEMESIS Web Probe",
+    "version": "1.0.0",
+    "description": "Sonde web pour capture de contexte temps réel (Phase 1)",
+    "permissions": [
+        "scripting"
+    ],
+    "host_permissions": [
+        "http://127.0.0.1:8000/*",
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
+}
