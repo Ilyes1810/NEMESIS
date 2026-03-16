@@ -1,0 +1,17 @@
+REGLE N°1 : Chaque employé doit utiliser un identifiant personnel nominatif ; le partage de compte est strictement interdit.
+
+REGLE N°4 : Il est strictement interdit de divulguer des informations confidentielles relatives aux clients, partenaires ou à l’entreprise.
+
+REGLE N°5 : Les données professionnelles ne doivent être stockées que sur les serveurs ou espaces cloud validés par l’entreprise.
+
+REGLE N°6 : L’installation de logiciels non autorisés par le service informatique est interdite.
+
+REGLE N°7 : Toute pièce jointe ou lien suspect doit être signalé au service informatique avant ouverture.
+
+REGLE N°8 : L’utilisation d’outils d’intelligence artificielle non validés par l’entreprise pour traiter des données sensibles est interdite.
+
+REGLE N°10 : Tout incident de sécurité (perte de matériel, tentative de phishing, intrusion) doit être signalé immédiatement.
+
+REGLE N°11 : Les communications numériques doivent rester professionnelles et conformes au code de conduite interne.
+
+REGLE N°12 : Le non-respect de ces règles expose l’employé à des sanctions disciplinaires pouvant aller jusqu’au licenciement.
